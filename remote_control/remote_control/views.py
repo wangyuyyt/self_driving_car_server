@@ -44,7 +44,6 @@ def run(request):
 			bw.speed = SPEED
 			bw.forward()
 			bw_status = 1
-			request.session['moving'] = True
 			debug = "speed =", SPEED
 		elif action == 'backward':
 			bw.speed = SPEED
@@ -53,7 +52,6 @@ def run(request):
 		elif action == 'stop':
 			bw.stop()
 			bw_status = 0
-			request.session['moving'] = False
 
 		# ============== Front wheels =============
 		elif action == 'fwready':
