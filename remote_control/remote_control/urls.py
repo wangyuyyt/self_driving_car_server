@@ -15,10 +15,8 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from django.http import StreamingHttpResponse
 from django.urls import path
 from . import views, settings
-from .driver.stream import VideoCamera, gen
             
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -26,6 +24,5 @@ urlpatterns = [
     url(r'^run/$', views.run),
     url(r'^cali/$', views.cali),
     url(r'^connection_test/$', views.connection_test),
-    path('monitor/', lambda r: StreamingHttpResponse(gen(VideoCamera()),
-        content_type='multipart/x-mixed-replace; boundary=frame')),
+    url('monitor/', views.monitor),
 ]         

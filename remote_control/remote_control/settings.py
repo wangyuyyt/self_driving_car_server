@@ -82,6 +82,7 @@ DATABASES = {
     }
 }
 
+SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators

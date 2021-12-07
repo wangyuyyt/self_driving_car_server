@@ -15,10 +15,13 @@ from django.contrib.sessions.backends.db import SessionStore
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.http import StreamingHttpResponse
+from . import line_follow_opencv
 import cv2 
 import numpy as np
 import os
+import queue
 import subprocess
+import sqlite3
 import tempfile
 
 def run_command(cmd):
@@ -32,7 +35,7 @@ def get_host():
         return run_command('hostname -I')
 
 class VideoCamera(object):
-    def __init__(self):
+    def __init__(self, front_wheel, back_wheel, status):
         # Using OpenCV to capture from device 0. If you have trouble capturing
         # from a webcam, comment the line below out and use a video file
         # instead.
@@ -40,15 +43,23 @@ class VideoCamera(object):
         # If you decide to use video.mp4, you must have this file in the folder
         # as the main.py.
         # self.video = cv2.VideoCapture('video.mp4')
+        # Get latest session
+        self.front_wheel = front_wheel
+        self.back_wheel = back_wheel
+        self.status = status
     
     def __del__(self):
         self.video.release()
     
     def get_frame(self):
         success, image = self.video.read()
+
         # Construct a black image if image from the camera is empty.
         if image is None:
             image = np.zeros((640, 480, 1), np.uint8)
+        # Get current status
+        line_follow_opencv.follow_line(
+                image, self.status, self.front_wheel, self.back_wheel)
         # We are using Motion JPEG, but OpenCV defaults to capture raw images,
         # so we must encode it into JPEG in order to correctly display the
         # video stream.

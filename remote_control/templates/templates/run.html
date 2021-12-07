@@ -80,7 +80,6 @@
       run_action('fwready');
       run_action('camready');
       var allowed = true;
-
       function run_action(value){
         var xmlHttp  = new XMLHttpRequest();
         var protocol  = window.location.protocol;
@@ -103,6 +102,7 @@
         xmlHttp.send( null );
         return xmlHttp.responseText;
       }
+
       function keydown_event(key){
         if (event.repeat != undefined) {
           allowed = !event.repeat;
@@ -321,6 +321,10 @@
         <div class="mui-col-xs-2 mui-col-sm-2", align="left">
             <button class="mui-btn mui-btn--primary" ontouchstart="camdown_right()" ontouchend="run_action('camready')" id="button_opacity">◿</button>
         </div>
+      </div>
+      <!--auto driving buttons -->
+      <div class="mui-row">
+        <button class="mui-btn mui-btn--primary" onmousedown="run_action('follow_lane_opencv')" id="button_opacity">Follow Lane with OpenCV</button>
       </div>
     </div>
   </body>

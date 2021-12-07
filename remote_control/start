@@ -12,6 +12,8 @@
 
 if [ "$1" = "" ]
 then
+    # clear expired sessions
+	python3 manage.py clearsessions
 	# Run server listen to any IP address and port 8000
 	echo "Server running"
 	python3 manage.py runserver 0.0.0.0:8000
