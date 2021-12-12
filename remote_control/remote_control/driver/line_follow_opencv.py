@@ -110,7 +110,6 @@ def make_points(image, average):
     y1 = height  # bottom of the frame
     y2 = int(y1 * 1 / 2)  # make points from middle of the frame down
 
-    # bound the coordinates within the frame
     x1 = int((y1 - intercept) / slope))
     x2 = int((y2 - intercept) / slope))
     return [x1, y1, x2, y2]
