@@ -58,8 +58,9 @@ class VideoCamera(object):
         if image is None:
             image = np.zeros((640, 480, 1), np.uint8)
         # Get current status
-        line_follow_opencv.follow_line(
-                image, self.status, self.front_wheel, self.back_wheel)
+        if self.status is not None and status[0][0] == 'follow_lane_opencv':
+            line_follow_opencv.follow_line(
+                image, self.front_wheel, self.back_wheel)
         # We are using Motion JPEG, but OpenCV defaults to capture raw images,
         # so we must encode it into JPEG in order to correctly display the
         # video stream.
