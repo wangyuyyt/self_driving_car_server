@@ -2,10 +2,10 @@ import cv2
 import math
 import numpy
 
-def follow_line(image, status, front_wheel, back_wheel):
+def follow_line(image, front_wheel, back_wheel):
     lanes = detect_lane(image)
     angle = lanes_to_angle(image, lanes)
-    if status is not None and status[0][0] == 'follow_lane_opencv' and angle is not None:
+    if angle is not None:
         front_wheel.turn(angle)
 
 def detect_lane(image):
@@ -149,7 +149,7 @@ def lanes_to_angle(image, lanes):
 
 def main():
     image = cv2.imread('/home/pi/Pictures/Webcam/13.jpg')
-    follow_line(image, None, None, None)
+    follow_line(image, None, None)
     cv2.imshow('image',image)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
