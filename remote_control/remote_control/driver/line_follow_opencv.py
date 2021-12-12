@@ -30,7 +30,7 @@ def detect_edges(image):
     edges = cv2.Canny(blue, 100, 200)
 
     # Only focus bottom half of the screen
-    # Create mask for upper half
+    # Create mask for bottom half
     height, width = edges.shape
     mask = numpy.zeros_like(edges)
 
