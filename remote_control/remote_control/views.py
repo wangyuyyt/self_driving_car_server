@@ -23,7 +23,7 @@ picar.setup()
 db_file = "remote_control/driver/config"
 fw = front_wheels.Front_Wheels(debug=False, db=db_file)
 bw = back_wheels.Back_Wheels(debug=False, db=db_file)
-cam = camera.Camera(debug=True, db=db_file)
+cam = camera.Camera(debug=False, db=db_file)
 cam.ready()
 bw.ready()
 fw.ready()
