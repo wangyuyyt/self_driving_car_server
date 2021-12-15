@@ -26,6 +26,5 @@ urlpatterns = [
     url(r'^run/$', views.run),
     url(r'^cali/$', views.cali),
     url(r'^connection_test/$', views.connection_test),
-    path('monitor/', lambda r: StreamingHttpResponse(gen(VideoCamera()),
-        content_type='multipart/x-mixed-replace; boundary=frame')),
+    url(r'^monitor/$', views.monitor),
 ]         

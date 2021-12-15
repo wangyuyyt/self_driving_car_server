@@ -32,7 +32,7 @@ def get_host():
         return run_command('hostname -I')
 
 class VideoCamera(object):
-    def __init__(self):
+    def __init__(self, fw, bw, status_list):
         # Using OpenCV to capture from device 0. If you have trouble capturing
         # from a webcam, comment the line below out and use a video file
         # instead.
@@ -40,6 +40,10 @@ class VideoCamera(object):
         # If you decide to use video.mp4, you must have this file in the folder
         # as the main.py.
         # self.video = cv2.VideoCapture('video.mp4')
+
+        self.fw = fw
+        self.bw = bw
+        self.status_list = status_list
     
     def __del__(self):
         self.video.release()
