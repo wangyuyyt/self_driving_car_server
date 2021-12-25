@@ -206,6 +206,13 @@
             break;
         }
       }
+      function fw_turn(value) {
+          run_action('test:' + value)
+      }
+      function slow_forward() {
+          set_speed('30')
+          run_action('forward')
+      }
       function forward_left(){
         run_action('forward')
         run_action('fwleft')

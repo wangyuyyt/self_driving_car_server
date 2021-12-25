@@ -168,6 +168,6 @@ def connection_test(request):
      return HttpResponse('OK')
 
 def monitor(request):
-    global status_list
+    global fw, bw, status_list
     return StreamingHttpResponse(gen(VideoCamera(fw, bw, status_list)),
         content_type='multipart/x-mixed-replace; boundary=frame')

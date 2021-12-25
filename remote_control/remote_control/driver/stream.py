@@ -11,10 +11,12 @@
 *               xxx    xxxx-xx-xx    xxxxxxxx
 **********************************************************************
 '''
+from datetime import datetime
 from django.contrib.sessions.backends.db import SessionStore
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.http import StreamingHttpResponse
+from . import lane_follow_dl
 import cv2 
 import numpy as np
 import os
@@ -44,6 +46,8 @@ class VideoCamera(object):
         self.fw = fw
         self.bw = bw
         self.status_list = status_list
+        self.lane_follow = lane_follow_dl.LaneFollowDeepLearning(
+                                 fw, bw, status_list, dry_run=False)
     
     def __del__(self):
         self.video.release()
@@ -53,6 +57,22 @@ class VideoCamera(object):
         # Construct a black image if image from the camera is empty.
         if image is None:
             image = np.zeros((640, 480, 1), np.uint8)
+
+        angle = self.status_list[0][2]
+        speed = self.status_list[0][3]
+        # Auto steering
+        if self.status_list is not None and self.status_list[0][0] == 'follow_lane':
+            angle = self.lane_follow.follow_lane(image)
+
+        # Save image and angle as training data
+        if (self.status_list is not None and len(self.status_list) == 1 
+                and self.status_list[0][0] != 'stop'  # backwheel status
+                and self.status_list[0][1] ==  1  # save data
+            ):
+            timestr = datetime.utcnow().strftime('%Y-%m-%d-%H-%M-%S.%f')[:-3]
+            print ('savedata-%s-%d-%d' % (timestr, speed, angle))
+            cv2.imwrite('/home/pi/Pictures/picar/trainingdata-tmp/%s-%d-%d.jpg' % (timestr, speed, angle), image)
+
         # We are using Motion JPEG, but OpenCV defaults to capture raw images,
         # so we must encode it into JPEG in order to correctly display the
         # video stream.
