@@ -150,7 +150,7 @@
         if (document.getElementById('save_data').checked) {
           url = protocol + "//" + host + pathname + "?savedata" + "=1";
         } else {
-          url = protocol + "//" + host + pathname + "?speed" + "=0";
+          url = protocol + "//" + host + pathname + "?savedata" + "=0";
         }
         xmlHttp.open( "GET", url, false );
         xmlHttp.send( null );
