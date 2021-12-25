@@ -35,21 +35,60 @@
       #div_streamer {
         background: url(http://{{ host }}:8000/monitor/) no-repeat center center;
         background-size: 80% auto;
-        width:  50%;
+        width:  40%;
         height:  100%;
         position:relative;
       }        
       #div_control {
-        width:  50%;
+        width:  60%;
         height: 50%;
         position: absolute;
         top: 15%;
-        left: 50%;
+        left: 40%;
       }   
       #button_opacity {
         opacity: 0.4;
       }
+        #arc-slider {
+		height: 110px !important;
+		width: 500px !important;
+		overflow: hidden;
+		padding: 15px;
+	}
+	
     </style>
+    <style>
+        #arc-slider {
+        height: 110px !important;
+        width: 500px !important;
+        overflow: hidden;
+        padding: 15px;
+        }
+        #arc-slider .rs-container {
+            margin-left: -350px; /* here 350 is the radius value */
+            left: 50%;
+        }
+        #arc-slider .rs-tooltip {
+            top: 60px;
+        }
+        #arc-slider .rs-tooltip-text {
+            font-size: 25px;
+        }
+        #arc-slider .rs-border{
+            border-width: 0px;
+        }
+
+        /* Appearance related changes */
+        .rs-control .rs-range-color {
+            background-color: #54BBE0;
+        }
+        .rs-control .rs-path-color {
+            background-color: #5f5f5f;
+        }
+        .rs-control .rs-handle {
+            background-color: #51c5cf;
+        }
+        </style>
   </head>
 
   <body class="mui--no-user-select" onkeydown="keydown_event(0)" onkeyup="keyup_event(0)">
@@ -99,6 +138,20 @@
         var pathname  = window.location.pathname;
         url = protocol + "//" + host + pathname + "?speed" + "=" + value;
         //document.getElementById("debug").innerHTML=url;
+        xmlHttp.open( "GET", url, false );
+        xmlHttp.send( null );
+        return xmlHttp.responseText;
+      }
+      function set_save_data() {
+        var xmlHttp  = new XMLHttpRequest();
+        var protocol  = window.location.protocol;
+        var host      = window.location.host;
+        var pathname  = window.location.pathname;
+        if (document.getElementById('save_data').checked) {
+          url = protocol + "//" + host + pathname + "?savedata" + "=1";
+        } else {
+          url = protocol + "//" + host + pathname + "?speed" + "=0";
+        }
         xmlHttp.open( "GET", url, false );
         xmlHttp.send( null );
         return xmlHttp.responseText;
@@ -206,13 +259,6 @@
             break;
         }
       }
-      function fw_turn(value) {
-          run_action('test:' + value)
-      }
-      function slow_forward() {
-          set_speed('30')
-          run_action('forward')
-      }
       function forward_left(){
         run_action('forward')
         run_action('fwleft')
@@ -265,24 +311,28 @@
     <div id="div_control">
       <div class="mui-row">
         <button class="mui-btn mui--text-subhead" disabled>Speed:</button>
-        <button class="mui-btn mui-btn--primary mui-btn--fab" onmousedown="set_speed('40')" id="button_opacity">1</button>
-        <button class="mui-btn mui-btn--primary mui-btn--fab" onmousedown="set_speed('55')" id="button_opacity">2</button>
-        <button class="mui-btn mui-btn--primary mui-btn--fab" onmousedown="set_speed('70')" id="button_opacity">3</button>
-        <button class="mui-btn mui-btn--primary mui-btn--fab" onmousedown="set_speed('85')" id="button_opacity">4</button>
-        <button class="mui-btn mui-btn--primary mui-btn--fab" onmousedown="set_speed('100')" id="button_opacity">5</button>
-        <button class="mui-btn mui-btn--primary" onmousedown="toggle('div_appbar')" id="button_opacity">Fullscreen</button>
+        <button class="mui-btn mui-btn--primary mui-btn--fab" onmousedown="set_speed('0')" id="button_opacity">0</button>
+        <button class="mui-btn mui-btn--primary mui-btn--fab" onmousedown="set_speed('20')" id="button_opacity">20</button>
+        <button class="mui-btn mui-btn--primary mui-btn--fab" onmousedown="set_speed('30')" id="button_opacity">30</button>
+        <button class="mui-btn mui-btn--primary mui-btn--fab" onmousedown="set_speed('40')" id="button_opacity">40</button>
+        <button class="mui-btn mui-btn--primary mui-btn--fab" onmousedown="set_speed('50')" id="button_opacity">50</button>
+        <button class="mui-btn mui-btn--primary mui-btn--fab" onmousedown="set_speed('60')" id="button_opacity">60</button>
+        <button class="mui-btn mui-btn--primary mui-btn--fab" onmousedown="set_speed('70')" id="button_opacity">70</button>
+        <button class="mui-btn mui-btn--primary mui-btn--fab" onmousedown="set_speed('80')" id="button_opacity">80</button>
+        <button class="mui-btn mui-btn--primary mui-btn--fab" onmousedown="set_speed('90')" id="button_opacity">90</button>
+        <button class="mui-btn mui-btn--primary mui-btn--fab" onmousedown="set_speed('100')" id="button_opacity">100</button>
       </div>
       <!-- Control Panel-->
       <!--Forward, Camera up button  ◤◥-->
       <div class="mui-row">
-        <div class="mui-col-xs-2 mui-col-sm-2", align="right">
-          <button class="mui-btn mui-btn--primary" ontouchstart="forward_left()"ontouchend="stop()" id="button_opacity">◤</button>
+        <div class="mui-col-xs-2 mui-col-sm-2", align="center">
+          <button class="mui-btn mui-btn--primary" onmousedown="run_action('forward')" id="button_opacity">▲</button>
         </div>
         <div class="mui-col-xs-2 mui-col-sm-2", align="center">
-          <button class="mui-btn mui-btn--primary" ontouchstart="run_action('forward')" ontouchend="stop()" id="button_opacity">▲</button>
+            <button class="mui-btn mui-btn--primary" onmousedown="run_action('backward')" id="button_opacity">▼</button>
         </div>
-        <div class="mui-col-xs-2 mui-col-sm-2", align="left">
-          <button class="mui-btn mui-btn--primary" ontouchstart="forward_right()"ontouchend="stop()" id="button_opacity">◥</button>
+        <div class="mui-col-xs-2 mui-col-sm-2", align="center">
+          <button class="mui-btn mui-btn--primary" onmousedown="stop()" id="button_opacity">■</button>
         </div>
         <div class="mui-col-xs-2 mui-col-sm-2", align="right">
           <button class="mui-btn mui-btn--primary" ontouchstart="camup_left()"ontouchend="run_action('camready')" id="button_opacity">◸</button>
@@ -296,7 +346,11 @@
       </div>
       <!--Camera Left, Right button-->
       <div class="mui-row">
-        <div class="mui-col-xs-2 mui-col-sm-2 mui-col-sm-offset-6 mui-col-xs-offset-6", align="right">
+        <div class="mui-col-xs-2 mui-col-sm-2", align="center">
+            <input type="checkbox" id="save_data" name="SaveData" onclick="set_save_data()">
+            <label for="save_data">Save Data</label>
+        </div>
+        <div class="mui-col-xs-2 mui-col-sm-2 mui-col-sm-offset-4 mui-col-xs-offset-6", align="right">
           <button class="mui-btn mui-btn--primary" ontouchstart="run_action('camleft')" ontouchend="run_action('camready')" id="button_opacity">◁</button>
         </div>
         <!--
@@ -310,16 +364,7 @@
       </div>
       <!--Backward button-->
       <div class="mui-row">
-        <div class="mui-col-xs-2 mui-col-sm-2", align="right">
-            <button class="mui-btn mui-btn--primary" ontouchstart="backward_left()" ontouchend="stop()" id="button_opacity">◣</button>
-        </div>
-        <div class="mui-col-xs-2 mui-col-sm-2", align="center">
-            <button class="mui-btn mui-btn--primary" ontouchstart="run_action('backward')" ontouchend="stop()" id="button_opacity">▼</button>
-        </div>
-        <div class="mui-col-xs-2 mui-col-sm-2", align="left">
-            <button class="mui-btn mui-btn--primary" ontouchstart="backward_right()" ontouchend="stop()" id="button_opacity">◢</button>
-        </div>
-        <div class="mui-col-xs-2 mui-col-sm-2", align="right">
+        <div class="mui-col-xs-2 mui-col-sm-2 mui-col-sm-offset-6 mui-col-xs-offset-6", align="right">
             <button class="mui-btn mui-btn--primary" ontouchstart="camdown_left()" ontouchend="run_action('camready')" id="button_opacity">◺</button>
         </div>
         <div class="mui-col-xs-2 mui-col-sm-2", align="center">
@@ -329,6 +374,35 @@
             <button class="mui-btn mui-btn--primary" ontouchstart="camdown_right()" ontouchend="run_action('camready')" id="button_opacity">◿</button>
         </div>
       </div>
+      <div class="mui-row">
+          <button class="mui-btn mui-btn--primary" onmousedown="run_action('follow_lane')" id="button_opacity">Follow Lane</button>
+      </div>
+      <div id="arc-slider" class="rslider"></div>
+
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/jquery.roundslider/1.0/roundslider.min.js"></script>
+      <link href="https://cdn.jsdelivr.net/jquery.roundslider/1.0/roundslider.min.css" rel="stylesheet">
+      <script type="text/javascript">
+          function fw_turn(value) {
+              run_action('fwturn:' + value)
+          }
+          $("#arc-slider").roundSlider({
+          sliderType: "min-range",
+          circleShape: "custom-quarter",
+          value: 50,
+          startAngle: 45,
+          editableTooltip: false,
+          radius: 350,
+          width: 6,
+          handleSize: "+32",
+          drag: function (args) {
+              fw_turn(args.value + 40)
+          },
+          tooltipFormat: function (args) {
+              return args.value + 40 + " &deg;";
+          }
+      });
+      </script>
     </div>
   </body>
 </html>

@@ -27,12 +27,13 @@ cam.ready()
 bw.ready()
 fw.ready()
  
-SPEED = 60
+SPEED = 30
 BW_STATUS = 'stop'
 FW_ANGLE = 90
 CAM_PAN = 90
 CAM_TILT = 90
-status_list = [[BW_STATUS, SPEED]]
+SAVE_DATA = 0
+status_list = [[BW_STATUS, SAVE_DATA, FW_ANGLE, SPEED]]
 
 def show_status():
      global SPEED, BW_STATUS, FW_ANGLE, CAM_PAN, CAM_TILT
@@ -44,12 +45,16 @@ def home(request):
      return render(request, "base.html")
 
 def run(request):
-     global SPEED, BW_STATUS, FW_ANGLE, CAM_PAN, CAM_TILT, q
+     global SPEED, BW_STATUS, FW_ANGLE, CAM_PAN, CAM_TILT, SAVE_DATA
      debug = ''
      if 'action' in request.GET:
           action = request.GET['action']
+          if action == 'follow_lane':
+              BW_STATUS = action
+              bw.speed = 30
+              bw.forward()
           # ============== Back wheels =============
-          if action == 'bwready':
+          elif action == 'bwready':
                bw.ready()
                BW_STATUS = 'stop'
           elif action == 'forward':
@@ -76,7 +81,6 @@ def run(request):
           elif action == 'fwstraight':
                FW_ANGLE = fw.turn_straight()
           elif 'fwturn' in action:
-               print("turn %s" % action)
                angle = int(action.split(':')[1])
                FW_ANGLE = angle
                fw.turn(angle)
@@ -102,11 +106,11 @@ def run(request):
           if BW_STATUS != 'stop':
                bw.speed = speed
           debug = "speed =", speed
-     #status.save()
-     #print(status)
-     #q.put(BW_STATUS)
-     status_list[0] = [BW_STATUS, SPEED]
-     show_status()
+
+     if 'savedata' in request.GET:
+         SAVE_DATA = int(request.GET['savedata'])
+         
+     status_list[0] = [BW_STATUS, SAVE_DATA, FW_ANGLE, SPEED]
      host = stream.get_host().decode('utf-8').split(' ')[0]
      return render(request, "run.html", {'host': host})
 
