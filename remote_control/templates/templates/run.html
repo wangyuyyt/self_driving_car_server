@@ -35,16 +35,23 @@
       #div_streamer {
         background: url(http://{{ host }}:8000/monitor/) no-repeat center center;
         background-size: 80% auto;
-        width:  40%;
-        height:  100%;
+        width:  30%;
+        height:  40%;
+        position:relative;
+      }        
+      #div_streamer2 {
+        background: url(http://{{ host }}:8000/monitor2/) no-repeat center center;
+        background-size: 80% auto;
+        width:  30%;
+        height:  40%;
         position:relative;
       }        
       #div_control {
-        width:  60%;
+        width:  70%;
         height: 50%;
         position: absolute;
         top: 15%;
-        left: 40%;
+        left: 30%;
       }   
       #button_opacity {
         opacity: 0.4;
@@ -118,6 +125,7 @@
       run_action('bwready');
       run_action('fwready');
       run_action('camready');
+      roboarm('ready', 1);
       var allowed = true;
 
       function run_action(value){
@@ -152,6 +160,16 @@
         } else {
           url = protocol + "//" + host + pathname + "?savedata" + "=0";
         }
+        xmlHttp.open( "GET", url, false );
+        xmlHttp.send( null );
+        return xmlHttp.responseText;
+      }
+      function roboarm(value, angle) {
+        var xmlHttp  = new XMLHttpRequest();
+        var protocol  = window.location.protocol;
+        var host      = window.location.host;
+        var pathname  = window.location.pathname;
+        url = protocol + "//" + host + pathname + "?arm" + "=" + value + ":" + angle;
         xmlHttp.open( "GET", url, false );
         xmlHttp.send( null );
         return xmlHttp.responseText;
@@ -306,8 +324,59 @@
             }
         }
       }
+      
+      function arm_pan_minus() {
+        value = parseInt(document.getElementById('armpan').value) - 1;
+        document.getElementById('armpan').value = value;
+        arm_pan_value(value);
+      }
+      function arm_pan_plus() {
+        value = parseInt(document.getElementById('armpan').value) + 1;
+        document.getElementById('armpan').value = value;
+        arm_pan_value(value);
+      }
+      function arm_pan_value(value) {
+        document.getElementById("armpan_value").innerHTML=value;
+        roboarm("pan", value)
+      }
+      function arm_forward_minus() {
+        value  = parseInt(document.getElementById('armforward').value) - 1;
+        document.getElementById('armforward').value = value;
+        arm_forward_value(value)
+      }
+      function arm_forward_plus() {
+        value  = parseInt(document.getElementById('armforward').value) + 1;
+        document.getElementById('armforward').value = value;
+        arm_forward_value(value)
+      }
+      function arm_forward_value(value) {
+        document.getElementById("armforward_value").innerHTML=value;
+        roboarm("forward", value)
+      }
+      function arm_vertical_minus() {
+        value  = parseInt(document.getElementById('armvertical').value) - 1;
+        document.getElementById('armvertical').value = value;
+        arm_vertical_value(value)
+      }
+      function arm_vertical_plus() {
+        value  = parseInt(document.getElementById('armvertical').value) + 1;
+        document.getElementById('armvertical').value = value;
+        arm_vertical_value(value)
+      }
+      function arm_vertical_value(value) {
+        document.getElementById("armvertical_value").innerHTML=value;
+        roboarm("vertical", value)
+      }
+      function arm_clamp() {
+        if (document.getElementById('armclamp').checked) {
+          roboarm("open", 1)
+        } else {
+          roboarm("close", 1)
+        }
+      }
     </script>
     <div id="div_streamer"></div>
+    <div id="div_streamer2"></div>
     <div id="div_control">
       <div class="mui-row">
         <button class="mui-btn mui--text-subhead" disabled>Speed:</button>
@@ -325,57 +394,46 @@
       <!-- Control Panel-->
       <!--Forward, Camera up button  ◤◥-->
       <div class="mui-row">
-        <div class="mui-col-xs-2 mui-col-sm-2", align="center">
-          <button class="mui-btn mui-btn--primary" onmousedown="run_action('forward')" id="button_opacity">▲</button>
-        </div>
-        <div class="mui-col-xs-2 mui-col-sm-2", align="center">
-            <button class="mui-btn mui-btn--primary" onmousedown="run_action('backward')" id="button_opacity">▼</button>
-        </div>
-        <div class="mui-col-xs-2 mui-col-sm-2", align="center">
-          <button class="mui-btn mui-btn--primary" onmousedown="stop()" id="button_opacity">■</button>
-        </div>
-        <div class="mui-col-xs-2 mui-col-sm-2", align="right">
-          <button class="mui-btn mui-btn--primary" ontouchstart="camup_left()"ontouchend="run_action('camready')" id="button_opacity">◸</button>
-        </div>
-        <div class="mui-col-xs-2 mui-col-sm-2", align="center">
-          <button class="mui-btn mui-btn--primary" ontouchstart="run_action('camup')" ontouchend="run_action('camready')" id="button_opacity">△</button>
-        </div>
+        <button class="mui-btn mui--text-subhead" disabled>Car:</button>
+        <button class="mui-btn mui-btn--primary" onmousedown="run_action('forward')" id="button_opacity">▲</button>
+        <button class="mui-btn mui-btn--primary" onmousedown="run_action('backward')" id="button_opacity">▼</button>
+        <button class="mui-btn mui-btn--primary" onmousedown="stop()" id="button_opacity">■</button>
+        <button class="mui-btn mui-btn--primary" onmousedown="run_action('follow_lane')" id="button_opacity">Follow Lane</button>
+        <input type="checkbox" id="save_data" name="SaveData" onclick="set_save_data()">
+        <label for="save_data">Save Data</label>
+      </div>
+      <div class="mui-row">
         <div class="mui-col-xs-2 mui-col-sm-2", align="left">
-          <button class="mui-btn mui-btn--primary" ontouchstart="camup_right()" ontouchend="run_action('camready')" id="button_opacity">◹</button>
+            <button class="mui-btn mui--text-subhead" disabled>Roboarm:</button>
         </div>
-      </div>
-      <!--Camera Left, Right button-->
-      <div class="mui-row">
-        <div class="mui-col-xs-2 mui-col-sm-2", align="center">
-            <input type="checkbox" id="save_data" name="SaveData" onclick="set_save_data()">
-            <label for="save_data">Save Data</label>
+        <div class="mui-col-xs-2 mui-col-sm-4", align="left">
+            Pan: 
+            <span id="armpan_value" style="color:red;font-weight:bold;">90</span><br>
+            <input type="button" value="-" onClick="arm_pan_minus()">
+            0 <input type="range" min="0" max="180" step="1", value="90" id="armpan", oninput="arm_pan_value(this.value)"> 180
+            <input type="button" value="+" onClick="arm_pan_plus()">
         </div>
-        <div class="mui-col-xs-2 mui-col-sm-2 mui-col-sm-offset-4 mui-col-xs-offset-6", align="right">
-          <button class="mui-btn mui-btn--primary" ontouchstart="run_action('camleft')" ontouchend="run_action('camready')" id="button_opacity">◁</button>
+        <div class="mui-col-xs-2 mui-col-sm-4", align="left">
+            Forward/Backward: 
+            <span id="armforward_value" style="color:red;font-weight:bold;">90</span><br>
+            <input type="button" value="-" onClick="arm_forward_minus()">
+            0 <input type="range" min="0" max="180" step="1", value="90" id="armforward", oninput="arm_forward_value(this.value)"> 180
+            <input type="button" value="+" onClick="arm_forward_plus()">
         </div>
-        <!--
-        <div class="mui-col-xs-2 mui-col-sm-2", align="center">
-          <button class="mui-btn mui-btn--primary" ontouchstart="run_action('camready')" ontouchend="run_action('camready')">□</button>
-        </div>
-        -->
-        <div class="mui-col-xs-2 mui-col-sm-2 mui-col-sm-offset-2 mui-col-xs-offset-2", align="left">
-          <button class="mui-btn mui-btn--primary" ontouchstart="run_action('camright')" ontouchend="run_action('camready')" id="button_opacity">▷</button>
-        </div>
-      </div>
-      <!--Backward button-->
-      <div class="mui-row">
-        <div class="mui-col-xs-2 mui-col-sm-2 mui-col-sm-offset-6 mui-col-xs-offset-6", align="right">
-            <button class="mui-btn mui-btn--primary" ontouchstart="camdown_left()" ontouchend="run_action('camready')" id="button_opacity">◺</button>
+        <div class="mui-col-xs-2 mui-col-sm-4", align="left">
+            Vertical:
+            <span id="armvertical_value" style="color:red;font-weight:bold;">90</span><br>
+            <input type="button" value="-" onClick="arm_vertical_minus()">
+            0 <input type="range" min="0" max="180" step="1", value="90" id="armvertical", oninput="arm_vertical_value(this.value)"> 180
+            <input type="button" value="+" onClick="arm_vertical_plus()">
         </div>
         <div class="mui-col-xs-2 mui-col-sm-2", align="center">
-            <button class="mui-btn mui-btn--primary" ontouchstart="run_action('camdown')" ontouchend="run_action('camready')" id="button_opacity">▽</button>
+          <input type="checkbox" id="armclamp" name="Open Clamp" onclick="arm_clamp()">
+          <label for="save_data">Open Clamp</label>
         </div>
-        <div class="mui-col-xs-2 mui-col-sm-2", align="left">
-            <button class="mui-btn mui-btn--primary" ontouchstart="camdown_right()" ontouchend="run_action('camready')" id="button_opacity">◿</button>
+        <div class="mui-col-xs-2 mui-col-sm-2", align="center">
+          <button class="mui-btn mui-btn--primary" onclick="roboarm('pickup', 1)">Pick Up</button>
         </div>
-      </div>
-      <div class="mui-row">
-          <button class="mui-btn mui-btn--primary" onmousedown="run_action('follow_lane')" id="button_opacity">Follow Lane</button>
       </div>
       <div id="arc-slider" class="rslider"></div>
 

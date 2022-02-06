@@ -27,4 +27,5 @@ urlpatterns = [
     url(r'^cali/$', views.cali),
     url(r'^connection_test/$', views.connection_test),
     url(r'^monitor/$', views.monitor),
+    url(r'^monitor2/$', views.monitor2),
 ]         

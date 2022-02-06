@@ -11,29 +11,44 @@
 '''
 
 from django.shortcuts import render
-from .driver import camera, stream
-from .driver.stream import VideoCamera, gen
+from .driver import camera, stream, roboarm
+from .driver.stream import VideoCamera, gen, CameraStream
 from picar import back_wheels, front_wheels
 from django.http import HttpResponse
 from django.http import StreamingHttpResponse
+from threading import Thread
+import picamera
 import picar
+import time
 
 picar.setup()
 db_file = "/home/pi/SunFounder_PiCar-V/remote_control/remote_control/driver/config"
 fw = front_wheels.Front_Wheels(debug=False, db=db_file)
 bw = back_wheels.Back_Wheels(debug=False, db=db_file)
 cam = camera.Camera(debug=False, db=db_file)
+roboarm = roboarm.Roboarm(debug=False, db=db_file)
 cam.ready()
 bw.ready()
 fw.ready()
+roboarm.ready()
  
 SPEED = 30
 BW_STATUS = 'stop'
 FW_ANGLE = 90
 CAM_PAN = 90
 CAM_TILT = 90
+ARM_PAN = 90
+ARM_FORWARD = 90
+ARM_VERTICAL = 90
+ARM_CLAMP = 90
 SAVE_DATA = 0
 status_list = [[BW_STATUS, SAVE_DATA, FW_ANGLE, SPEED]]
+
+# Initialize Camera Module stream
+cam_stream = CameraStream()
+Camthread1 = Thread(None, cam_stream.start)
+Camthread1.start()
+#cam_stream.start()
 
 def show_status():
      global SPEED, BW_STATUS, FW_ANGLE, CAM_PAN, CAM_TILT
@@ -46,6 +61,7 @@ def home(request):
 
 def run(request):
      global SPEED, BW_STATUS, FW_ANGLE, CAM_PAN, CAM_TILT, SAVE_DATA
+     global ARM_PAN, ARM_FORWARD, ARM_VERTICAL, ARM_CLAMP
      debug = ''
      if 'action' in request.GET:
           action = request.GET['action']
@@ -106,6 +122,27 @@ def run(request):
           if BW_STATUS != 'stop':
                bw.speed = speed
           debug = "speed =", speed
+
+     if 'arm' in request.GET:
+         arm = request.GET['arm']
+         (arm_action, arm_param) = arm.split(':')
+         arm_param = int(arm_param)
+         if arm_action == 'pan':
+             ARM_PAN = roboarm.pan(arm_param)
+         elif arm_action == 'forward':
+             ARM_FORWARD = roboarm.forward(arm_param)
+         elif arm_action == 'vertical':
+             ARM_VERTICAL = roboarm.vertical(arm_param)
+         elif arm_action == 'open':
+             ARM_CLAMP = roboarm.open_clamp()
+         elif arm_action == 'close':
+             ARM_CLAMP = roboarm.close_clamp()
+         elif arm_action == 'calibration':
+             roboarm.calibration()
+         elif arm_action == 'pickup':
+             roboarm.pickup()
+         elif arm_action == 'ready':
+             roboarm.ready()
 
      if 'savedata' in request.GET:
          SAVE_DATA = int(request.GET['savedata'])
@@ -174,4 +211,8 @@ def connection_test(request):
 def monitor(request):
     global fw, bw, status_list
     return StreamingHttpResponse(gen(VideoCamera(fw, bw, status_list)),
+        content_type='multipart/x-mixed-replace; boundary=frame')
+
+def monitor2(request):
+    return StreamingHttpResponse(gen(cam_stream),
         content_type='multipart/x-mixed-replace; boundary=frame')

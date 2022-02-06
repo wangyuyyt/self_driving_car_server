@@ -17,11 +17,15 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.http import StreamingHttpResponse
 from . import lane_follow_dl
+from PIL import Image
 import cv2 
+import io
 import numpy as np
 import os
+import picamera
 import subprocess
 import tempfile
+import time
 
 def run_command(cmd):
         with tempfile.TemporaryFile() as f:
@@ -85,3 +89,31 @@ def gen(camera):
         frame = camera.get_frame()
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+
+class CameraStream(object):
+    def __init__(self):
+        self.stream = io.BytesIO()
+        self.current_frame = b''
+
+    def write(self, buf):
+        if buf.startswith(b'\xff\xd8'):
+            # Start of new frame; send the old one's length
+            # then the data
+            size = self.stream.tell()
+            if size > 0:
+                self.stream.seek(0)
+                self.current_frame = self.stream.read(size)
+                self.stream.seek(0)
+        self.stream.write(buf)
+
+    def get_frame(self):
+        return self.current_frame
+
+    def start(self):
+        with picamera.PiCamera(resolution=(640, 480), framerate=30) as camera:
+            time.sleep(2)
+            camera.start_recording(self, format='mjpeg')
+            while True:
+                camera.wait_recording(1)
+            camera.stop_recording()
+
