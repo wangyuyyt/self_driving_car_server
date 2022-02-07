@@ -6,7 +6,7 @@ from picar import filedb
 import picar
 
 class Roboarm(object):
-        '''Camera movement control class'''
+        '''Robot Arm movement control class'''
         pan_channel = 6			# Pan servo channel
         forward_channel = 8		# Forward drive arm servo channel
         vertical_channel = 7            # Vertical drive arm servo channel
@@ -83,11 +83,11 @@ class Roboarm(object):
 
         def forward(self, expect_forward, delay=DELAY, smooth=False):
             target_forward = self.safe_value(expect_forward)
-            if smooth:
-                self.smooth_move(self.forward_servo, self.current_forward,
-                        target_forward, delay)
-            else:
-                self.forward_servo.write(target_forward)
+            #if smooth:
+            self.smooth_move(self.forward_servo, self.current_forward,
+                    target_forward, delay)
+            #else:
+            #    self.forward_servo.write(target_forward)
             self.current_forward = target_forward
             time.sleep(delay)
             return self.current_forward
